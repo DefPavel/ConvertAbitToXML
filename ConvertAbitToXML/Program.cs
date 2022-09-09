@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using static System.Net.WebRequestMethods;
 
 namespace ConvertAbitToXML
 {
@@ -53,9 +54,12 @@ namespace ConvertAbitToXML
                     {
                         // Какая-то странная фигня в бд (неужели оно реально хранит подобным образом)
                         if (p.Photo == "/files/no-photo.png")
-                            p.Photo = "https://abt.lgpu.org/files/no-photo.png"; 
-                        
-
+                            p.Photo = "https://abt.lgpu.org/files/no-photo.png";
+                        // Если директории нет,то создать
+                        if (!Directory.Exists(startupPath + "\\photo"))
+                        {
+                            Directory.CreateDirectory(startupPath + "\\photo");
+                        }
                         FullPathPhoto = $"{startupPath}\\photo\\{index}-image.bmp";
                         await ApiToAbt.SaveImage(p.Photo, FullPathPhoto, ImageFormat.Bmp);
 
@@ -89,7 +93,7 @@ namespace ConvertAbitToXML
                     //GenerateXML.SerializeToXml(Readers, "reader.xml");
 
                     GenerateXML.SerializeObject(Readers, Encoding.GetEncoding(1251), "One_chance.xml");
-
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine("Файл создан");
                 }
                 else Console.WriteLine("Список студентов пуст");
