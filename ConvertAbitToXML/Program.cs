@@ -27,8 +27,8 @@ namespace ConvertAbitToXML
         #endregion
 
         // Регистрация кодировки win 1251
-        
 
+        // TODO: ЗАМЕНИ ArrayReaders -> LibraryExportReaders [Первый Массив]
         static async Task Main()
         {
             // на всякий случай
@@ -38,7 +38,7 @@ namespace ConvertAbitToXML
             try
             {
                 string startupPath = Directory.GetCurrentDirectory();
-                int index = 80000; // Здесь указывай номер id последнего студента в их BD
+                int index = 58220; // Здесь указывай номер id последнего студента в их BD
                 string FullPathPhoto = string.Empty;
 
                 // Получить список студентов из abt
@@ -52,45 +52,49 @@ namespace ConvertAbitToXML
                     // Ставлю для того что у них нет primary key и нужно самому генерировать ключ
                     foreach (Persons p in Persons)
                     {
-                        // Какая-то странная фигня в бд (неужели оно реально хранит подобным образом)
-                        if (p.Photo == "/files/no-photo.png")
-                            p.Photo = "https://abt.lgpu.org/files/no-photo.png";
-                        // Если директории нет,то создать
-                        if (!Directory.Exists(startupPath + "\\photo"))
+                        if (p.Level != "Магистратура")
                         {
-                            Directory.CreateDirectory(startupPath + "\\photo");
+                            // Какая-то странная фигня в бд (неужели оно реально хранит подобным образом)
+                            if (p.Photo == "/files/no-photo.png")
+                                p.Photo = "https://abt.lgpu.org/files/no-photo.png";
+                            // Если директории нет,то создать
+                            if (!Directory.Exists(startupPath + "\\photo"))
+                            {
+                                Directory.CreateDirectory(startupPath + "\\photo");
+                            }
+                            FullPathPhoto = $"{startupPath}\\photo\\{index}-image.bmp";
+                            await ApiToAbt.SaveImage(p.Photo, FullPathPhoto, ImageFormat.Bmp);
+
+                            if (p.Category == "Очная")
+                                p.Category = "Студент (д/о)";
+                            else
+                                p.Category = "Студент (з/о)";
+
+
+                            Readers.Add(new Reader
+                            {
+                                Code = index, // Номер читательскего билета
+                                Kod = p.Kod, // ИНН
+                                Name = p.FullName,// Полное имя
+                                Adress = p.Adress,// Адрес
+                                BirthDate = p.BirthDate.ToShortDateString(),// Дата рождения
+                                PassportSeries = p.PassportSeries, // Серия паспорта
+                                PassportNo = p.PassportNo, //Номер паспорта 
+                                PassportOrg = p.PassportOrg, // Кем выдан
+                                WorkPlace = p.Department, // Институт, Факультет
+                                Post = p.Group, // Наименование группы
+                                PagerPhone = 1517, // Неактуальное старьё
+                                Category = p.Category, // Форма обучения
+                                Photo = $"photo/{index}-image.bmp", // Записываем локальный путь photo для XML
+                                RegisterDate = DateTime.Now.ToShortDateString(),
+                                ServiceBegDate = DateTime.Now.ToShortDateString()
+                            });
+                            index++;
                         }
-                        FullPathPhoto = $"{startupPath}\\photo\\{index}-image.bmp";
-                        await ApiToAbt.SaveImage(p.Photo, FullPathPhoto, ImageFormat.Bmp);
-
-                        if (p.Category == "Очная") 
-                            p.Category = "Студент (д/о)";
-                        else 
-                            p.Category = "Студент (з/о)";
-
-                        Readers.Add(new Reader
-                        {
-                            Code = index, // Номер читательскего билета
-                            Kod = p.Kod, // ИНН
-                            Name = p.FullName,// Полное имя
-                            Adress = p.Adress,// Адрес
-                            BirthDate = p.BirthDate.ToShortDateString(),// Дата рождения
-                            PassportSeries = p.PassportSeries, // Серия паспорта
-                            PassportNo = p.PassportNo, //Номер паспорта 
-                            PassportOrg = p.PassportOrg, // Кем выдан
-                            WorkPlace = p.Department, // Институт, Факультет
-                            Post = p.Group, // Наименование группы
-                            PagerPhone = 1517, // Неактуальное старьё
-                            Category = p.Category, // Форма обучения
-                            Photo = $"photo/{index}-image.bmp", // Записываем локальный путь photo для XML
-                            RegisterDate = DateTime.Now.ToShortDateString(),
-                            ServiceBegDate = DateTime.Now.ToShortDateString()
-                        });
-                        index++;
+                        Console.WriteLine("Фотографии сгенерированы");
+                        // 3. Проводим Сереализацию
+                        //GenerateXML.SerializeToXml(Readers, "reader.xml");    
                     }
-                    Console.WriteLine("Фотографии сгенерированы");
-                    // 3. Проводим Сереализацию
-                    //GenerateXML.SerializeToXml(Readers, "reader.xml");
 
                     GenerateXML.SerializeObject(Readers, Encoding.GetEncoding(1251), "One_chance.xml");
                     Console.ForegroundColor = ConsoleColor.Green;

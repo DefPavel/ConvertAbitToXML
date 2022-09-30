@@ -53,21 +53,16 @@ namespace ConvertAbitToXML
         [JsonPropertyName("group_name")]
         public string Group { get; set; } // Наименование Группы
 
-        /* 
-         public string WorkPlace { get; set; } // Инстиут-Факультет
-
-         public string Post { get; set; } // По идеи (на какой специальности учиться)
-
-         public int PagerPhone { get; set; } // Сюда рандомные 4 цифры    
-         public int PagerNo { get; set; } // 0        
-         public int IsBlocked { get; set; } // 0
-         public DateTime ServiceBegDate { get; set; } // 11.09.2021
-         public int Comment { get; set; } // 0
-         public DateTime RegisterDate { get; set; } // 11.09.2021
-         */
+        [JsonPropertyName("st_name")]
+        public string Level { get; set; } // Образовательный уровень
 
 
-        /*<Code>55090</Code>
+
+
+        /*
+         * ПРИМЕР КАК ДОЛЖНО БЫТЬ
+        <LibraryExportReaders>
+        <Code>55090</Code>
         <Kod>3753602263</Kod>
         <Name> Волкова Диана Сергеевна </Name>
         <Address> ЛНР Луганская область Ровеньки кв.Гагарина 4 34 </Address>
@@ -84,6 +79,8 @@ namespace ConvertAbitToXML
         <ServiceBegDate>11.09.2020</ServiceBegDate>
         <Comment> 0 </Comment>
         <RegisterDate>11.09.2020</RegisterDate>
-        <Photo> foto\foto1.jpg </Photo>*/
+        <Photo> foto\foto1.jpg </Photo>
+        </LibraryExportReaders>
+        */
     }
 }
